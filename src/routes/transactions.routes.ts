@@ -16,7 +16,7 @@ transactionsRouter.get('/', async (request: Request, response: Response) => {
 
   const transactions = await transactionsRepository.find({
     relations: ['category'],
-    select: ['id', 'title', "value", "type", "created_at", "updated_at"]
+    select: ['id', 'title', 'value', 'type', 'created_at', 'updated_at'],
   });
 
   const balance = await transactionsRepository.getBalance();
@@ -31,29 +31,36 @@ transactionsRouter.post('/', async (request: Request, response: Response) => {
     title,
     value,
     type,
-    category
+    category,
   });
   return response.json(transaction);
 });
 
-transactionsRouter.delete('/:id', async (request: Request, response: Response) => {
-  const { id } = request.params;
+transactionsRouter.delete(
+  '/:id',
+  async (request: Request, response: Response) => {
+    const { id } = request.params;
 
-  const deleteTransactionService = new DeleteTransactionService();
+    const deleteTransactionService = new DeleteTransactionService();
 
-  await deleteTransactionService.execute({ id });
+    await deleteTransactionService.execute({ id });
 
-  return response.status(204).send()
-});
+    return response.status(204).send();
+  },
+);
 
-transactionsRouter.post('/import', upload.single('file'), async (request: Request, response: Response) => {
-  const importTransactionsService = new ImportTransactionsService();
+transactionsRouter.post(
+  '/import',
+  upload.single('file'),
+  async (request: Request, response: Response) => {
+    const importTransactionsService = new ImportTransactionsService();
 
-  const transactions = await importTransactionsService.execute({
-    filename: request.file.filename
-  });
+    const transactions = await importTransactionsService.execute({
+      filename: request.file.filename,
+    });
 
-  return response.json(transactions);
-});
+    return response.json(transactions);
+  },
+);
 
 export default transactionsRouter;
